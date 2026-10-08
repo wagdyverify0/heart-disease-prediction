@@ -177,12 +177,17 @@ if submitted:
     st.subheader(L(f"Hi \u2068{clean_name}\u2069 👋", f"أهلاً \u2068{clean_name}\u2069") if clean_name else L("Your result 👋", "نتيجتك"))
     st.metric(L("Your BMI", "مؤشر كتلة جسمك"), f"{bmi:.1f}")
 
-    st.caption(
-        "• Under < 18.5: Underweight / أقل من 18.5: تحت الوزن الطبيعي\n"
-        "• 18.5 - 24.9: Normal weight / 18.5 إلى 24.9: وزن طبيعي\n"
-        "• 25.0 - 29.9: Overweight / 25 إلى 29.9: زيادة وزن\n"
-        "• 30.0 - 39.9: Obesity / 30 إلى 39.9: سمنة\n"
-        "• ≥ 40.0: Severe Obesity (Class III) / 40 فأكثر: سمنة مفرطة / شديدة (Obesity Class III)"
+    st.markdown(
+        """
+        <div dir="rtl" style="text-align:right; line-height:1.9">
+            <div>1. أقل من 18.5: تحت الوزن الطبيعي.</div>
+            <div>2. 18.5 إلى 24.9: وزن طبيعي.</div>
+            <div>3. 25 إلى 29.9: زيادة وزن.</div>
+            <div>4. 30 إلى 39.9: سمنة.</div>
+            <div>5. <strong>40 فأكثر:</strong> سمنة مفرطة / شديدة (Obesity Class III).</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
     detail = f"(model score {score:.2f}, cut-off {threshold:.2f})"
