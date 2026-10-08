@@ -124,14 +124,9 @@ def yn(label, default="No"):
     return st.radio(label, options, format_func=bi(YN_AR), horizontal=True)
 
 
-st.set_page_config(page_title="Heart Disease Risk", page_icon="❤️")
-st.title("❤️ Heart Disease Risk Estimator")
-st.markdown('<h3 dir="rtl" style="text-align:right">مقدّر خطر أمراض القلب</h3>', unsafe_allow_html=True)
-st.caption(
-    "Learning project trained on CDC 2020 survey data. "
-    "It is NOT a medical tool and cannot diagnose anything."
-)
-ar_block("مشروع تعليمي مبني على بيانات استبيان أمريكي لسنة 2020. ده مش أداة طبية ومينفعش يشخّص أي مرض.", small=True)
+st.set_page_config(page_title="CardioSense", page_icon="❤️")
+st.title("❤️ CardioSense")
+st.markdown('<h3 dir="rtl" style="text-align:right">تقييم مخاطر أمراض القلب</h3>', unsafe_allow_html=True)
 
 model, threshold, columns = load_model()
 
