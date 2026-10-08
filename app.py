@@ -24,7 +24,6 @@ DIABETIC_MAP = {
 
 
 def bmi_bin(v):
-    # same bins as the training notebook
     if v < 16:
         return 0
     if v < 17:
@@ -51,7 +50,6 @@ def sleep_bin(h):
 
 
 def days_bin(d):
-    # PhysicalHealth / MentalHealth: bad days in the last 30
     if d <= 10:
         return 0
     if d <= 20:
@@ -62,7 +60,6 @@ def days_bin(d):
 
 
 def encode(a, columns):
-    """Turn the form answers into the exact feature row the model was trained on."""
     yn = lambda x: 1 if x == "Yes" else 0
     row = {
         "BMI": bmi_bin(a["bmi"]),
@@ -91,11 +88,10 @@ def load_model():
     return bundle["model"], bundle["threshold"], bundle["columns"]
 
 
-RLI, PDI = "\u2067", "\u2069"   # right-to-left isolate: keeps Arabic in order next to English
+RLI, PDI = "\u2067", "\u2069"
 
 
 def L(en, ar):
-    """Bilingual text: English / Arabic (Arabic isolated so it renders in the right order)."""
     return f"{en} / {RLI}{ar}{PDI}"
 
 
@@ -120,7 +116,6 @@ AGE_AR = {"80 or older": "80 أو أكثر"}
 
 
 def bi(opts_ar):
-    """Show 'English / Arabic' for an option, but keep the English value."""
     return lambda v: L(v, opts_ar[v]) if v in opts_ar else v
 
 
@@ -181,6 +176,15 @@ if submitted:
     clean_name = re.sub(r"[^\w\s\-]", "", name, flags=re.UNICODE).strip()
     st.subheader(L(f"Hi \u2068{clean_name}\u2069 👋", f"أهلاً \u2068{clean_name}\u2069") if clean_name else L("Your result 👋", "نتيجتك"))
     st.metric(L("Your BMI", "مؤشر كتلة جسمك"), f"{bmi:.1f}")
+
+    st.caption(
+        "• Under < 18.5: Underweight / أقل من 18.5: تحت الوزن الطبيعي\n"
+        "• 18.5 - 24.9: Normal weight / 18.5 إلى 24.9: وزن طبيعي\n"
+        "• 25.0 - 29.9: Overweight / 25 إلى 29.9: زيادة وزن\n"
+        "• 30.0 - 39.9: Obesity / 30 إلى 39.9: سمنة\n"
+        "• ≥ 40.0: Severe Obesity (Class III) / 40 فأكثر: سمنة مفرطة / شديدة (Obesity Class III)"
+    )
+
     detail = f"(model score {score:.2f}, cut-off {threshold:.2f})"
     if score >= threshold:
         st.error(f"Higher-risk profile {detail}")
