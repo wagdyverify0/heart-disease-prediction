@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import joblib
@@ -100,6 +101,7 @@ st.caption(
 model, threshold, columns = load_model()
 
 with st.form("form"):
+    name = st.text_input("Your name (optional)", max_chars=30)
     c1, c2 = st.columns(2)
     with c1:
         sex = st.selectbox("Sex", ["Female", "Male"])
@@ -134,6 +136,8 @@ if submitted:
     x = encode(answers, columns)
     score = float(model.predict_proba(x)[0, 1])
 
+    clean_name = re.sub(r"[^\w\s\-]", "", name, flags=re.UNICODE).strip()
+    st.subheader(f"Hi {clean_name} 👋" if clean_name else "Your result 👋")
     st.metric("Your BMI", f"{bmi:.1f}")
     if score >= threshold:
         st.error(f"Higher-risk profile (model score {score:.2f}, cut-off {threshold:.2f})")
