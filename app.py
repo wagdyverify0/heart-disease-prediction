@@ -91,6 +91,22 @@ def load_model():
     return bundle["model"], bundle["threshold"], bundle["columns"]
 
 
+RLI, PDI = "\u2067", "\u2069"   # right-to-left isolate: keeps Arabic in order next to English
+
+
+def L(en, ar):
+    """Bilingual text: English / Arabic (Arabic isolated so it renders in the right order)."""
+    return f"{en} / {RLI}{ar}{PDI}"
+
+
+def ar_block(text, small=False):
+    size = "0.85rem" if small else "1rem"
+    st.markdown(
+        f'<div dir="rtl" style="text-align:right; font-size:{size}; opacity:{0.75 if small else 1}">{text}</div>',
+        unsafe_allow_html=True,
+    )
+
+
 SEX_AR = {"Female": "أنثى", "Male": "ذكر"}
 GEN_AR = {"Poor": "ضعيفة", "Fair": "مقبولة", "Good": "جيدة", "Very good": "جيدة جداً", "Excellent": "ممتازة"}
 DIAB_AR = {
@@ -100,55 +116,55 @@ DIAB_AR = {
     "Yes": "نعم",
 }
 YN_AR = {"Yes": "نعم", "No": "لا"}
+AGE_AR = {"80 or older": "80 أو أكثر"}
 
 
 def bi(opts_ar):
-    """Show 'English / عربي' for an option, but keep the English value."""
-    return lambda v: f"{v} / {opts_ar[v]}" if v in opts_ar else ("80 أو أكثر / 80 or older" if v == "80 or older" else v)
+    """Show 'English / Arabic' for an option, but keep the English value."""
+    return lambda v: L(v, opts_ar[v]) if v in opts_ar else v
 
 
-def yn(label, key_default="No"):
-    options = ["No", "Yes"] if key_default == "No" else ["Yes", "No"]
+def yn(label, default="No"):
+    options = ["No", "Yes"] if default == "No" else ["Yes", "No"]
     return st.radio(label, options, format_func=bi(YN_AR), horizontal=True)
 
 
 st.set_page_config(page_title="Heart Disease Risk", page_icon="❤️")
 st.title("❤️ Heart Disease Risk Estimator")
-st.subheader("مقدّر خطر أمراض القلب")
+st.markdown('<h3 dir="rtl" style="text-align:right">مقدّر خطر أمراض القلب</h3>', unsafe_allow_html=True)
 st.caption(
     "Learning project trained on CDC 2020 survey data. "
-    "It is NOT a medical tool and cannot diagnose anything.\n\n"
-    "مشروع تعليمي مبني على بيانات استبيان من CDC لسنة 2020. "
-    "ده مش أداة طبية ومينفعش يشخّص أي مرض."
+    "It is NOT a medical tool and cannot diagnose anything."
 )
+ar_block("مشروع تعليمي مبني على بيانات استبيان أمريكي لسنة 2020. ده مش أداة طبية ومينفعش يشخّص أي مرض.", small=True)
 
 model, threshold, columns = load_model()
 
 with st.form("form"):
-    name = st.text_input("Your name (optional) / اسمك (اختياري)", max_chars=30)
+    name = st.text_input(L("Your name (optional)", "اسمك (اختياري)"), max_chars=30)
     c1, c2 = st.columns(2)
     with c1:
-        sex = st.selectbox("Sex / الجنس", ["Female", "Male"], format_func=bi(SEX_AR))
-        age = st.selectbox("Age group / الفئة العمرية", list(AGE_MAP), index=6, format_func=bi({}))
-        height = st.number_input("Height (cm) / الطول (سم)", 120, 220, 170)
-        weight = st.number_input("Weight (kg) / الوزن (كجم)", 30, 200, 70)
-        sleep = st.slider("Sleep (hours per night) / النوم (ساعات في الليلة)", 1, 24, 7)
-        gen_health = st.selectbox("General health / صحتك العامة", list(GENHEALTH_MAP), index=2, format_func=bi(GEN_AR))
-        diabetic = st.selectbox("Diabetes / السكر", list(DIABETIC_MAP), format_func=bi(DIAB_AR))
+        sex = st.selectbox(L("Sex", "الجنس"), ["Female", "Male"], format_func=bi(SEX_AR))
+        age = st.selectbox(L("Age group", "الفئة العمرية"), list(AGE_MAP), index=6, format_func=bi(AGE_AR))
+        height = st.number_input(L("Height (cm)", "الطول بالسنتيمتر"), 120, 220, 170)
+        weight = st.number_input(L("Weight (kg)", "الوزن بالكيلو"), 30, 200, 70)
+        sleep = st.slider(L("Sleep (hours per night)", "ساعات النوم في الليلة"), 1, 24, 7)
+        gen_health = st.selectbox(L("General health", "صحتك العامة"), list(GENHEALTH_MAP), index=2, format_func=bi(GEN_AR))
+        diabetic = st.selectbox(L("Diabetes", "السكر"), list(DIABETIC_MAP), format_func=bi(DIAB_AR))
     with c2:
-        smoking = yn("Smoked 100+ cigarettes in your life? / دخّنت 100 سيجارة أو أكتر في حياتك؟")
-        alcohol = yn("Heavy drinker? / بتشرب كحول بكثرة؟")
-        stroke = yn("Ever had a stroke? / جالك جلطة أو سكتة دماغية قبل كده؟")
-        diff_walking = yn("Serious difficulty walking/climbing stairs? / صعوبة كبيرة في المشي أو طلوع السلم؟")
-        activity = yn("Physical activity in the last 30 days? / مارست نشاط بدني في آخر 30 يوم؟", "Yes")
-        asthma = yn("Asthma? / ربو؟")
-        kidney = yn("Kidney disease? / مرض في الكلى؟")
-        skin_cancer = yn("Skin cancer? / سرطان جلد؟")
+        smoking = yn(L("Smoked 100+ cigarettes in your life?", "دخّنت 100 سيجارة أو أكتر في حياتك؟"))
+        alcohol = yn(L("Heavy drinker?", "بتشرب كحول بكثرة؟"))
+        stroke = yn(L("Ever had a stroke?", "جالك جلطة أو سكتة دماغية قبل كده؟"))
+        diff_walking = yn(L("Serious difficulty walking/climbing stairs?", "صعوبة كبيرة في المشي أو طلوع السلم؟"))
+        activity = yn(L("Physical activity in the last 30 days?", "مارست نشاط بدني في آخر 30 يوم؟"), "Yes")
+        asthma = yn(L("Asthma?", "ربو؟"))
+        kidney = yn(L("Kidney disease?", "مرض في الكلى؟"))
+        skin_cancer = yn(L("Skin cancer?", "سرطان جلد؟"))
     physical_days = st.slider(
-        "Days in the last 30 with poor physical health / عدد الأيام في آخر 30 يوم كانت صحتك الجسدية فيها سيئة", 0, 30, 0)
+        L("Days in the last 30 with poor physical health", "عدد الأيام في آخر 30 يوم كانت صحتك الجسدية فيها سيئة"), 0, 30, 0)
     mental_days = st.slider(
-        "Days in the last 30 with poor mental health / عدد الأيام في آخر 30 يوم كانت نفسيتك فيها سيئة", 0, 30, 0)
-    submitted = st.form_submit_button("Estimate risk / احسب الخطر")
+        L("Days in the last 30 with poor mental health", "عدد الأيام في آخر 30 يوم كانت نفسيتك فيها سيئة"), 0, 30, 0)
+    submitted = st.form_submit_button(L("Estimate risk", "احسب الخطر"))
 
 if submitted:
     bmi = weight / ((height / 100) ** 2)
@@ -163,21 +179,20 @@ if submitted:
     score = float(model.predict_proba(x)[0, 1])
 
     clean_name = re.sub(r"[^\w\s\-]", "", name, flags=re.UNICODE).strip()
-    st.subheader(f"Hi {clean_name} 👋 / أهلاً {clean_name}" if clean_name else "Your result 👋 / نتيجتك")
-    st.metric("Your BMI / مؤشر كتلة جسمك", f"{bmi:.1f}")
-    detail = f"(model score {score:.2f}, cut-off {threshold:.2f} / درجة الموديل {score:.2f}، حد الفصل {threshold:.2f})"
+    st.subheader(L(f"Hi \u2068{clean_name}\u2069 👋", f"أهلاً \u2068{clean_name}\u2069") if clean_name else L("Your result 👋", "نتيجتك"))
+    st.metric(L("Your BMI", "مؤشر كتلة جسمك"), f"{bmi:.1f}")
+    detail = f"(model score {score:.2f}, cut-off {threshold:.2f})"
     if score >= threshold:
-        st.error(f"Higher-risk profile / ملفك الصحي أعلى خطورة {detail}")
+        st.error(f"Higher-risk profile {detail}")
+        ar_block("ملفك الصحي أعلى خطورة. الأفضل تكلّم دكتور.")
     else:
-        st.success(f"Lower-risk profile / ملفك الصحي أقل خطورة {detail}")
+        st.success(f"Lower-risk profile {detail}")
+        ar_block("ملفك الصحي أقل خطورة.")
     st.caption(
         "The score is a relative ranking, not a real probability. "
-        "If you are worried about your health, talk to a doctor.\n\n"
-        "الدرجة دي ترتيب نسبي بين الناس، مش احتمال حقيقي للإصابة. "
-        "لو قلقان على صحتك كلّم دكتور."
+        "If you are worried about your health, talk to a doctor."
     )
+    ar_block("الدرجة دي ترتيب نسبي بين الناس، مش احتمال حقيقي للإصابة. لو قلقان على صحتك كلّم دكتور.", small=True)
     if bmi > 43:
-        st.warning(
-            "BMI above ~43 is outside most of the training data, so the estimate is less reliable. / "
-            "مؤشر كتلة الجسم فوق 43 تقريباً خارج أغلب بيانات التدريب، فالتقدير أقل دقة."
-        )
+        st.warning("BMI above ~43 is outside most of the training data, so the estimate is less reliable.")
+        ar_block("مؤشر كتلة الجسم فوق 43 تقريباً خارج أغلب بيانات التدريب، فالتقدير أقل دقة.", small=True)
