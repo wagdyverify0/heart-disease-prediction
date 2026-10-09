@@ -1,6 +1,8 @@
 # Heart Disease Risk Prediction
 
-A machine-learning project that estimates whether a person is at risk of heart disease from basic health and lifestyle answers (age group, BMI, smoking, diabetes, general health, etc.), with a small web app to try it out.
+A machine-learning project that estimates whether a person is at risk of heart disease from basic health and lifestyle answers (age group, BMI, smoking, diabetes, general health, etc.), with a bilingual (English/Arabic) web app anyone can try.
+
+**🔗 Live demo:** [https://heart-disease-prediction-sn2cjggr7k4vlwdzgkzf77.streamlit.app](https://heart-disease-prediction-sn2cjggr7k4vlwdzgkzf77.streamlit.app) (English / Arabic interface)
 
 > **Disclaimer:** this is a learning project built on survey data. It is **not** a medical tool and must not be used for diagnosis.
 
@@ -35,7 +37,7 @@ Accuracy alone is misleading here: predicting "no disease" for everyone would sc
 - Precision is 0.33: most positive predictions are false alarms. Recall is 0.49: about half of true cases are caught.
 - Data is US-only and from 2020.
 
-## Run it
+## Run it locally
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
